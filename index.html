@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FileConverter - Conversor de Imágenes Online Gratis y Seguro</title>
+  <meta name="description" content="Convierte tus imágenes a JPG, PNG, WEBP y BMP gratis. Proceso rápido, sin límites de tamaño y 100% privado en tu navegador.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- JSZip para descargar varios archivos en ZIP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- Iconos Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .drag-active { border-color: #2563eb !important; background-color: #eff6ff !important; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between font-sans">
+
+  <!-- Header / Barra Superior -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="bg-blue-600 text-white p-2 rounded-xl shadow-sm">
+          <i data-lucide="file-type" class="w-6 h-6"></i>
+        </div>
+        <span class="text-2xl font-black text-slate-900 tracking-tight">File<span class="text-blue-600">Converter</span></span>
+      </div>
+      <div class="text-xs sm:text-sm font-medium text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 flex items-center gap-1.5">
+        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+        <span class="hidden sm:inline">Procesamiento Local</span> 100% Privado
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-5xl mx-auto px-4 py-8 w-full flex-grow">
+    
+    <!-- Encabezado Principal -->
+    <div class="text-center max-w-2xl mx-auto mb-8">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+        Convierte tus Imágenes al Instante
+      </h1>
+      <p class="text-slate-600 text-base sm:text-lg">
+        Transforma formatos JPG, PNG, WEBP y BMP. Gratis, ilimitado y sin subir tus fotos a ningún servidor.
+      </p>
+    </div>
+
+    <!-- Anuncio Publicitario Superior (AdSense Banner) -->
+    <div class="w-full bg-slate-200/60 border border-dashed border-slate-300 rounded-2xl p-4 mb-8 text-center min-h-[90px] flex items-center justify-center">
+      <div class="text-xs text-slate-400 uppercase tracking-widest font-semibold">
+        <!-- Reemplazar este div con el código publicitario de Google AdSense -->
+        Espacio para Anuncio (AdSense Banner Superior)
+      </div>
+    </div>
+
+    <!-- Zona para arrastrar imágenes (Dropzone) -->
+    <div id="drop-zone" class="border-2 border-dashed border-slate-300 bg-white rounded-2xl p-8 sm:p-10 text-center hover:border-blue-500 hover:shadow-md transition-all cursor-pointer relative mb-8">
+      <input type="file" id="file-input" multiple accept="image/*" class="hidden">
+      <div class="flex flex-col items-center justify-center gap-3 pointer-events-none">
+        <div class="p-4 bg-blue-50 text-blue-600 rounded-full mb-1">
+          <i data-lucide="upload-cloud" class="w-10 h-10"></i>
+        </div>
+        <div>
+          <p class="text-lg font-semibold text-slate-800">Arrastra tus archivos aquí o <span class="text-blue-600 underline">haz clic para examinar</span></p>
+          <p class="text-xs text-slate-400 mt-1">Soporta JPG, PNG, WEBP, BMP, GIF, SVG</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Opciones de Configuración -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-8">
+      <h2 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-4 flex items-center gap-2">
+        <i data-lucide="sliders" class="w-4 h-4"></i> Configuración de Salida
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Formato de Salida -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Formato Objetivo</label>
+          <select id="target-format" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
+            <option value="image/webp" selected>WEBP (Optimizado para Web)</option>
+            <option value="image/jpeg">JPG / JPEG</option>
+            <option value="image/png">PNG (Transparencia)</option>
+            <option value="image/bmp">BMP</option>
+          </select>
+        </div>
+
+        <!-- Calidad -->
+        <div>
+          <div class="flex justify-between text-sm font-medium text-slate-700 mb-2">
+            <span>Calidad de compresión</span>
+            <span id="quality-val" class="text-blue-600 font-bold">85%</span>
+          </div>
+          <input type="range" id="quality-range" min="10" max="100" value="85" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 mt-2">
+        </div>
+
+        <!-- Prefijo Global / Renombrado masivo -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Prefijo personalizado (Opcional)</label>
+          <input type="text" id="custom-prefix" placeholder="Ej: foto_convertida" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Lista de Imágenes Cargadas -->
+    <div id="image-list-container" class="hidden mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-slate-800">Archivos cargados (<span id="file-count">0</span>)</h3>
+        <button id="clear-all-btn" class="text-xs text-rose-600 hover:underline flex items-center gap-1 font-medium">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Borrar todo
+        </button>
+      </div>
+
+      <div id="image-list" class="space-y-3 mb-6"></div>
+
+      <!-- Acciones de Conversión -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-end items-center bg-slate-100 p-4 rounded-2xl border border-slate-200">
+        <button id="convert-all-btn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm">
+          <i data-lucide="refresh-cw" class="w-5 h-5"></i> Convertir Archivos
+        </button>
+        <button id="download-zip-btn" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm hidden">
+          <i data-lucide="archive" class="w-5 h-5"></i> Descargar Todos (ZIP)
+        </button>
+      </div>
+    </div>
+
+    <!-- Anuncio Publicitario Inferior -->
+    <div class="w-full bg-slate-200/60 border border-dashed border-slate-300 rounded-2xl p-4 mb-12 text-center min-h-[90px] flex items-center justify-center">
+      <div class="text-xs text-slate-400 uppercase tracking-widest font-semibold">
+        <!-- Reemplazar este div con el código publicitario de Google AdSense -->
+        Espacio para Anuncio (AdSense Banner Inferior)
+      </div>
+    </div>
+
+    <!-- Contenido SEO y Explicativo (Vital para aprobación de AdSense) -->
+    <section class="mt-12 pt-8 border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-8 text-slate-600 text-sm">
+      <div>
+        <h3 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4 text-blue-600"></i> Conversión Ultra Rápida
+        </h3>
+        <p>
+          En <strong>FileConverter</strong> procesamos tus imágenes directamente utilizando la tecnología de tu propio navegador. Esto significa que no hay colas de espera, las conversiones son instantáneas y no consumes datos enviando tus fotos a servidores externos.
+        </p>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
+          <i data-lucide="lock" class="w-4 h-4 text-blue-600"></i> Máxima Privacidad
+        </h3>
+        <p>
+          Tus imágenes nunca salen de tu dispositivo. A diferencia de otros conversores online, con nuestra herramienta el 100% del trabajo se ejecuta localmente en tu ordenador o móvil. Nadie más tiene acceso a tus archivos.
+        </p>
+      </div>
+    </section>
+
+    <!-- Preguntas Frecuentes (FAQ) -->
+    <section class="mt-8 bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+      <h2 class="text-xl font-bold text-slate-900 mb-6">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        <div>
+          <h4 class="font-semibold text-slate-800">¿Tiene algún costo usar FileConverter?</h4>
+          <p class="text-slate-600 text-sm mt-1">No, nuestra herramienta es 100% gratuita y no requiere registros ni suscripciones.</p>
+        </div>
+        <div>
+          <h4 class="font-semibold text-slate-800">¿Cómo puedo cambiar el nombre de mis archivos antes de descargar?</h4>
+          <p class="text-slate-600 text-sm mt-1">Puedes hacer clic sobre el nombre de cada archivo cargado para editarlo individualmente, o bien añadir un prefijo global en las opciones de configuración.</p>
+        </div>
+        <div>
+          <h4 class="font-semibold text-slate-800">¿Qué formatos de salida son recomendados para la web?</h4>
+          <p class="text-slate-600 text-sm mt-1">Se recomienda utilizar el formato <strong>WEBP</strong> ya que ofrece la mejor compresión manteniendo una excelente calidad visual, ideal para acelerar la carga de páginas web.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pie de página -->
+  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4">
+      <p>© 2026 FileConverter. Conversión de archivos segura e instantánea en el cliente.</p>
+    </div>
+  </footer>
+
+  <!-- Lógica JavaScript -->
+  <script>
+    lucide.createIcons();
+
+    let filesArray = [];
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const imageListContainer = document.getElementById('image-list-container');
+    const imageList = document.getElementById('image-list');
+    const fileCount = document.getElementById('file-count');
+    const targetFormat = document.getElementById('target-format');
+    const qualityRange = document.getElementById('quality-range');
+    const qualityVal = document.getElementById('quality-val');
+    const customPrefix = document.getElementById('custom-prefix');
+    const convertAllBtn = document.getElementById('convert-all-btn');
+    const downloadZipBtn = document.getElementById('download-zip-btn');
+    const clearAllBtn = document.getElementById('clear-all-btn');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-active'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-active');
+      handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+    qualityRange.addEventListener('input', (e) => qualityVal.textContent = e.target.value + '%');
+
+    function handleFiles(files) {
+      const validFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+      if (validFiles.length === 0) return;
+
+      validFiles.forEach(file => {
+        filesArray.push({
+          id: Math.random().toString(36).substr(2, 9),
+          file: file,
+          customName: file.name.substring(0, file.name.lastIndexOf('.')),
+          convertedBlob: null,
+          convertedExt: ''
+        });
+      });
+
+      updateUI();
+    }
+
+    function updateUI() {
+      if (filesArray.length > 0) {
+        imageListContainer.classList.remove('hidden');
+        fileCount.textContent = filesArray.length;
+      } else {
+        imageListContainer.classList.add('hidden');
+      }
+
+      imageList.innerHTML = '';
+
+      filesArray.forEach((item) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm';
+        
+        const sizeKb = (item.file.size / 1024).toFixed(1);
+
+        itemEl.innerHTML = `
+          <div class="flex items-center gap-3 w-full md:w-auto">
+            <div class="w-12 h-12 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-200">
+              <img src="${URL.createObjectURL(item.file)}" class="w-full h-full object-cover">
+            </div>
+            <div class="min-w-0 flex-grow">
+              <input type="text" value="${item.customName}" data-id="${item.id}" class="custom-name-input text-sm font-semibold text-slate-800 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-blue-500 focus:bg-slate-50 focus:outline-none px-1 py-0.5 rounded w-full transition-all" title="Haz clic para modificar el nombre">
+              <p class="text-xs text-slate-400 mt-0.5">${item.file.type.split('/')[1].toUpperCase()} • ${sizeKb} KB</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+            ${item.convertedBlob ? `
+              <a href="${URL.createObjectURL(item.convertedBlob)}" download="${getFinalFileName(item)}" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-semibold py-2 px-3 rounded-lg flex items-center gap-1 transition-colors">
+                <i data-lucide="download" class="w-4 h-4"></i> Descargar
+              </a>
+            ` : `
+              <span class="text-xs text-slate-400 italic bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100">Pendiente</span>
+            `}
+            <button onclick="removeItem('${item.id}')" class="text-slate-400 hover:text-rose-500 p-2 rounded-lg transition-colors">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+        `;
+
+        imageList.appendChild(itemEl);
+      });
+
+      document.querySelectorAll('.custom-name-input').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const id = e.target.getAttribute('data-id');
+          const targetItem = filesArray.find(f => f.id === id);
+          if (targetItem) targetItem.customName = e.target.value || 'archivo';
+        });
+      });
+
+      lucide.createIcons();
+    }
+
+    function getFinalFileName(item) {
+      const globalPrefix = customPrefix.value.trim();
+      const baseName = item.customName.trim() || 'archivo';
+      const ext = item.convertedExt || 'jpg';
+
+      if (globalPrefix) {
+        return `${globalPrefix}_${baseName}.${ext}`;
+      }
+      return `${baseName}.${ext}`;
+    }
+
+    window.removeItem = function(id) {
+      filesArray = filesArray.filter(item => item.id !== id);
+      if (filesArray.length === 0) downloadZipBtn.classList.add('hidden');
+      updateUI();
+    };
+
+    clearAllBtn.addEventListener('click', () => {
+      filesArray = [];
+      downloadZipBtn.classList.add('hidden');
+      updateUI();
+    });
+
+    convertAllBtn.addEventListener('click', async () => {
+      const format = targetFormat.value;
+      const quality = parseFloat(qualityRange.value) / 100;
+      const ext = format.split('/')[1] === 'jpeg' ? 'jpg' : format.split('/')[1];
+
+      for (let item of filesArray) {
+        item.convertedBlob = await convertImage(item.file, format, quality);
+        item.convertedExt = ext;
+      }
+
+      downloadZipBtn.classList.remove('hidden');
+      updateUI();
+    });
+
+    function convertImage(file, format, quality) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+
+          if (format === 'image/jpeg') {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob((blob) => {
+            resolve(blob);
+          }, format, quality);
+        };
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    downloadZipBtn.addEventListener('click', () => {
+      const zip = new JSZip();
+      filesArray.forEach((item) => {
+        if (item.convertedBlob) {
+          zip.file(getFinalFileName(item), item.convertedBlob);
+        }
+      });
+
+      zip.generateAsync({ type: 'blob' }).then((content) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(content);
+        a.download = (customPrefix.value.trim() || 'archivos_convertidos') + '.zip';
+        a.click();
+      });
+    });
+  </script>
+</body>
+</html>
