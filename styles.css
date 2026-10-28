@@ -1,0 +1,5 @@
+/* Estilos personalizados para FileConverter */
+.drag-active { 
+  border-color: #2563eb !important; 
+  background-color: #eff6ff !important; 
+}
