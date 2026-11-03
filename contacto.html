@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacto - FileConverter</title>
+  <meta name="description" content="Ponte en contacto con el equipo de desarrollo de FileConverter.">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Iconos Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between font-sans">
+
+  <!-- Header / Barra Superior -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="bg-blue-600 text-white p-2 rounded-xl shadow-sm">
+          <i data-lucide="file-type" class="w-6 h-6"></i>
+        </div>
+        <span class="text-2xl font-black text-slate-900 tracking-tight">File<span class="text-blue-600">Converter</span></span>
+      </a>
+      <a href="index.html" class="text-xs sm:text-sm font-medium text-blue-600 hover:underline flex items-center gap-1">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al conversor
+      </a>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-3xl mx-auto px-4 py-12 w-full flex-grow">
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6">
+      
+      <div class="text-center max-w-lg mx-auto">
+        <h1 class="text-3xl font-extrabold text-slate-900 mb-2">Contacto</h1>
+        <p class="text-slate-600 text-sm">
+          ¿Tienes alguna duda, sugerencia de mejora o reporte de error sobre FileConverter? Estamos aquí para ayudarte.
+        </p>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+        <div class="p-4 bg-blue-50 text-blue-600 rounded-full flex-shrink-0">
+          <i data-lucide="mail" class="w-8 h-8"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-slate-900">Correo Electrónico de Soporte</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Respondemos habitualmente en menos de 48 horas hábiles.</p>
+          <a href="mailto:soporte@fileconverter.blog" class="text-blue-600 font-semibold hover:underline mt-2 inline-block">
+            soporte@fileconverter.blog
+          </a>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-6 text-slate-600 text-sm space-y-3">
+        <h3 class="font-bold text-slate-900">Preguntas Frecuentes antes de escribir:</h3>
+        <p>
+          🔹 <strong>¿Puedo usar la herramienta en proyectos comerciales?</strong> Sí, todas las conversiones generadas son de uso libre y gratuito.
+        </p>
+        <p>
+          🔹 <strong>¿Se guardan mis imágenes?</strong> No, recuerda que todo el procesamiento se realiza localmente en tu navegador web mediante tecnologías de cliente seguras.
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Pie de página -->
+  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>© 2026 FileConverter. Todos los derechos reservados.</p>
+      <div class="flex gap-4">
+        <a href="privacidad.html" class="hover:text-blue-600 transition-colors">Política de Privacidad</a>
+        <a href="contacto.html" class="hover:text-blue-600 transition-colors">Contacto</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>
