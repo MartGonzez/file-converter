@@ -133,12 +133,19 @@ convertBtn.addEventListener('click', async () => {
       if (format === 'wav') {
         item.convertedBlob = audioBufferToWav(audioBuffer, forceMono);
         item.convertedExt = 'wav';
+      } else if (format === 'aiff') {
+        item.convertedBlob = audioBufferToAiff(audioBuffer, forceMono);
+        item.convertedExt = 'aiff';
+      } else if (format === 'ogg' || format === 'webm') {
+        item.convertedBlob = await audioBufferToOpusStream(audioBuffer, format, kbps, forceMono);
+        item.convertedExt = format;
       } else {
         item.convertedBlob = audioBufferToMp3(audioBuffer, kbps, forceMono);
         item.convertedExt = 'mp3';
       }
       item.status = 'Completado';
     } catch (err) {
+      console.error(err);
       item.status = 'Error al decodificar';
     }
   }
@@ -149,6 +156,7 @@ convertBtn.addEventListener('click', async () => {
   renderAudioUI();
 });
 
+// 1. Exportar a WAV (PCM Little-Endian)
 function audioBufferToWav(buffer, forceMono) {
   const numChannels = forceMono ? 1 : buffer.numberOfChannels;
   const sampleRate = buffer.sampleRate;
@@ -189,6 +197,109 @@ function audioBufferToWav(buffer, forceMono) {
   return new Blob([out], { type: 'audio/wav' });
 }
 
+// 2. Exportar a AIFF (Apple PCM Big-Endian sin pérdida)
+function audioBufferToAiff(buffer, forceMono) {
+  const numChannels = forceMono ? 1 : buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const numSampleFrames = buffer.length;
+  const dataSize = numSampleFrames * numChannels * 2;
+  const totalSize = 54 + dataSize;
+  const out = new ArrayBuffer(totalSize);
+  const view = new DataView(out);
+
+  const writeString = (offset, str) => {
+    for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+  };
+
+  // Cabecera FORM / AIFF
+  writeString(0, 'FORM');
+  view.setUint32(4, totalSize - 8, false);
+  writeString(8, 'AIFF');
+
+  // Chunk COMM
+  writeString(12, 'COMM');
+  view.setUint32(16, 18, false);
+  view.setInt16(20, numChannels, false);
+  view.setUint32(22, numSampleFrames, false);
+  view.setInt16(26, 16, false); // 16-bit
+
+  // Sample rate en formato IEEE 754 80-bit extended
+  writeFloat80(view, 28, sampleRate);
+
+  // Chunk SSND
+  writeString(38, 'SSND');
+  view.setUint32(42, dataSize + 8, false);
+  view.setUint32(46, 0, false); // offset
+  view.setUint32(50, 0, false); // blockSize
+
+  let offset = 54;
+  for (let i = 0; i < numSampleFrames; i++) {
+    for (let ch = 0; ch < numChannels; ch++) {
+      let sample = buffer.getChannelData(ch)[i];
+      if (forceMono && buffer.numberOfChannels > 1) {
+        sample = (buffer.getChannelData(0)[i] + buffer.getChannelData(1)[i]) * 0.5;
+      }
+      sample = Math.max(-1, Math.min(1, sample));
+      view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, false);
+      offset += 2;
+    }
+  }
+  return new Blob([out], { type: 'audio/aiff' });
+}
+
+function writeFloat80(view, offset, val) {
+  if (val === 0) {
+    for (let i = 0; i < 10; i++) view.setUint8(offset + i, 0);
+    return;
+  }
+  const sign = val < 0 ? 0x8000 : 0;
+  val = Math.abs(val);
+  let exp = Math.floor(Math.log2(val));
+  const mantissa = val / Math.pow(2, exp);
+  exp += 16383;
+  view.setUint16(offset, sign | exp, false);
+  const hi = Math.floor(mantissa * 0x80000000);
+  const lo = Math.floor((mantissa * 0x80000000 - hi) * 0x100000000);
+  view.setUint32(offset + 2, hi, false);
+  view.setUint32(offset + 6, lo, false);
+}
+
+// 3. Exportar a OGG / WEBM usando MediaRecorder nativo
+function audioBufferToOpusStream(buffer, format, kbps, forceMono) {
+  return new Promise((resolve) => {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const dest = ctx.createMediaStreamDestination();
+    dest.channelCount = forceMono ? 1 : Math.min(2, buffer.numberOfChannels);
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(dest);
+
+    const preferredMime = format === 'ogg' && MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')
+      ? 'audio/ogg;codecs=opus'
+      : 'audio/webm;codecs=opus';
+
+    const recorder = new MediaRecorder(dest.stream, {
+      mimeType: preferredMime,
+      audioBitsPerSecond: kbps * 1000
+    });
+
+    const chunks = [];
+    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = () => {
+      ctx.close();
+      resolve(new Blob(chunks, { type: format === 'ogg' ? 'audio/ogg' : 'audio/webm' }));
+    };
+
+    recorder.start();
+    source.start(0);
+    source.onended = () => {
+      if (recorder.state !== 'inactive') recorder.stop();
+    };
+  });
+}
+
+// 4. Exportar a MP3 (LAMEJS)
 function audioBufferToMp3(buffer, kbps, forceMono) {
   const channels = forceMono ? 1 : Math.min(2, buffer.numberOfChannels);
   const mp3encoder = new lamejs.Mp3Encoder(channels, buffer.sampleRate, kbps);
