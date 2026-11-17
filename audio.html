@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversor de Audio Online Gratis (MP3, WAV) - FileConverter</title>
+  <meta name="description" content="Convierte archivos de audio MP3, WAV, OGG, M4A y FLAC gratis y sin subir nada a servidores. Procesamiento 100% privado en tu navegador.">
+  
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://fileconverter.blog/audio.html">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- JSZip para descargar en ZIP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- LAMEJS para codificar MP3 en el navegador -->
+  <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+  <!-- Iconos Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9CJHCMQJD0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9CJHCMQJD0');
+  </script>
+  
+  <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between font-sans">
+
+  <!-- Header / Barra Superior -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="bg-blue-600 text-white p-2 rounded-xl shadow-sm">
+          <i data-lucide="file-type" class="w-6 h-6"></i>
+        </div>
+        <span class="text-2xl font-black text-slate-900 tracking-tight">File<span class="text-blue-600">Converter</span></span>
+      </a>
+
+      <!-- Menú de Herramientas -->
+      <nav class="flex items-center gap-1 sm:gap-2 text-sm font-semibold">
+        <a href="index.html" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">Imágenes</a>
+        <a href="audio.html" class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600">Audio</a>
+      </nav>
+
+      <div class="hidden md:flex text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 items-center gap-1.5">
+        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+        <span>Procesamiento Local 100% Privado</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-5xl mx-auto px-4 py-8 w-full flex-grow">
+    
+    <div class="text-center max-w-2xl mx-auto mb-8">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+        Conversor de Audio Online Gratis
+      </h1>
+      <p class="text-slate-600 text-base sm:text-lg">
+        Transforma pistas de audio (MP3, WAV, OGG, M4A, FLAC) o extrae audio de videos MP4 directamente en tu navegador sin subir tus archivos a internet.
+      </p>
+    </div>
+
+    <!-- Anuncio Publicitario Superior -->
+    <div class="w-full bg-slate-200/60 border border-dashed border-slate-300 rounded-2xl p-4 mb-8 text-center min-h-[90px] flex items-center justify-center">
+      <div class="text-xs text-slate-400 uppercase tracking-widest font-semibold">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9229896071895838" crossorigin="anonymous"></script>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-9229896071895838"
+             data-ad-slot="8985036516"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+    </div>
+
+    <!-- Dropzone Audio -->
+    <div id="audio-drop-zone" class="border-2 border-dashed border-slate-300 bg-white rounded-2xl p-8 sm:p-10 text-center hover:border-blue-500 hover:shadow-md transition-all cursor-pointer relative mb-8">
+      <input type="file" id="audio-file-input" multiple accept="audio/*,video/mp4,video/webm" class="hidden">
+      <div class="flex flex-col items-center justify-center gap-3 pointer-events-none">
+        <div class="p-4 bg-blue-50 text-blue-600 rounded-full mb-1">
+          <i data-lucide="music" class="w-10 h-10"></i>
+        </div>
+        <div>
+          <p class="text-lg font-semibold text-slate-800">Arrastra tus audios o videos aquí o <span class="text-blue-600 underline">haz clic para examinar</span></p>
+          <p class="text-xs text-slate-400 mt-1">Soporta MP3, WAV, OGG, M4A, AAC, FLAC y extracción desde MP4</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuración de Audio -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-8">
+      <h2 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-4 flex items-center gap-2">
+        <i data-lucide="sliders" class="w-4 h-4"></i> Configuración de Salida de Audio
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Formato Objetivo</label>
+          <select id="audio-target-format" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
+            <option value="mp3" selected>MP3 (Compatible Universal)</option>
+            <option value="wav">WAV (Audio Sin Pérdida / Estudio)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Calidad MP3 (Bitrate)</label>
+          <select id="audio-bitrate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
+            <option value="128">128 kbps (Ligero / Voz y Podcasts)</option>
+            <option value="192" selected>192 kbps (Estándar Alta Calidad)</option>
+            <option value="320">320 kbps (Calidad Máxima Música)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Canales de Audio</label>
+          <select id="audio-channels" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
+            <option value="auto" selected>Mantener Original (Estéreo/Mono)</option>
+            <option value="1">Mono (Reduce peso a la mitad)</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Lista de Audios Cargados -->
+    <div id="audio-list-container" class="hidden mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-slate-800">Pistas cargadas (<span id="audio-count">0</span>)</h3>
+        <button id="audio-clear-btn" class="text-xs text-rose-600 hover:underline flex items-center gap-1 font-medium">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Borrar todo
+        </button>
+      </div>
+
+      <div id="audio-list" class="space-y-3 mb-6"></div>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-end items-center bg-slate-100 p-4 rounded-2xl border border-slate-200">
+        <button id="audio-convert-btn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm">
+          <i data-lucide="refresh-cw" class="w-5 h-5"></i> Convertir Audios
+        </button>
+        <button id="audio-zip-btn" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm hidden">
+          <i data-lucide="archive" class="w-5 h-5"></i> Descargar Todos (ZIP)
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenido SEO Técnico sobre Audio -->
+    <section class="mt-12 pt-8 border-t border-slate-200 text-slate-600 text-sm space-y-6">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-3">Guía sobre Formatos de Audio: MP3 vs WAV y Optimización de Bitrate</h2>
+        <p class="leading-relaxed mb-3">
+          Elegir el formato de audio adecuado depende directamente del uso final de la grabación. Mientras que el formato <strong>WAV</strong> almacena ondas sonoras sin compresión ofreciendo fidelidad de estudio para edición profesional, el formato <strong>MP3</strong> utiliza algoritmos psicoacústicos para reducir el tamaño del archivo hasta en un 90%, permitiendo compartir canciones, entrevistas o notas de voz sin consumir ancho de banda innecesario.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
+            <i data-lucide="headphones" class="w-4 h-4 text-blue-600"></i> Web Audio API Nativa
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600">
+            Decodificamos tus archivos mediante el motor de audio nativo de tu navegador, logrando conversiones limpias sin subidas lentas a servidores remotos.
+          </p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
+            <i data-lucide="video" class="w-4 h-4 text-blue-600"></i> Extractor de Audio de Video
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600">
+            ¿Necesitas solo la voz o música de un video MP4? Arrástralo directamente a la zona de carga y expórtalo como MP3 o WAV al instante.
+          </p>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
+            <i data-lucide="lock" class="w-4 h-4 text-blue-600"></i> Grabaciones Confidenciales
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600">
+            Ideal para periodistas, músicos y estudiantes: tus grabaciones privadas jamás salen de la memoria RAM de tu dispositivo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pie de página -->
+  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>© 2026 FileConverter. Conversión de archivos multiformato segura e instantánea.</p>
+      <div class="flex gap-4">
+        <a href="privacidad.html" class="hover:text-blue-600 transition-colors">Política de Privacidad</a>
+        <a href="contacto.html" class="hover:text-blue-600 transition-colors">Contacto</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/audio.js"></script>
+</body>
+</html>
