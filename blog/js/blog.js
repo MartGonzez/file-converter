@@ -15,33 +15,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 2. CONFIGURACIÓN DE ADSTERRA (Pega aquí tus datos cuando aprueben tu sitio)
-  const ADSTERRA = {
-    nativeContainerId: "", // Ej: "container-a1b2c3d4e5f6"
-    nativeScriptSrc: "",   // Ej: "//pl12345678.effectivegatecpm.com/a1b2c3d4e5f6/invoke.js"
-    socialBarSrc: ""       // Ej: "//pl12345678.effectivegatecpm.com/xx/yy/zz/script.js"
-  };
-
-  // Inyectar Native Banner en el primer contenedor disponible
+  // 2. Native Banner (Adsterra)
   const adSlots = document.querySelectorAll(".ad-slot");
-  if (adSlots.length > 0 && ADSTERRA.nativeContainerId && ADSTERRA.nativeScriptSrc) {
+  if (adSlots.length > 0) {
     const targetSlot = adSlots[0];
+
     const container = document.createElement("div");
-    container.id = ADSTERRA.nativeContainerId;
+    container.id = "container-cd398c8515f1079aa5aeb0049a8eb3af";
     targetSlot.appendChild(container);
 
-    const script = document.createElement("script");
-    script.async = true;
-    script.dataset.cfasync = "false";
-    script.src = ADSTERRA.nativeScriptSrc;
-    targetSlot.appendChild(script);
+    const nativeScript = document.createElement("script");
+    nativeScript.async = true;
+    nativeScript.setAttribute("fetchpriority", "high");
+    nativeScript.dataset.cfasync = "false";
+    nativeScript.src = "https://bauval.org/21/cd398c8515f1079aa5aeb0049a8eb3af";
+    targetSlot.appendChild(nativeScript);
   }
 
-  // Inyectar Social Bar una vez por página
-  if (ADSTERRA.socialBarSrc) {
-    const socialScript = document.createElement("script");
-    socialScript.type = "text/javascript";
-    socialScript.src = ADSTERRA.socialBarSrc;
-    document.body.appendChild(socialScript);
-  }
+  // 3. Social Bar / Script flotante (Adsterra)
+  const socialScript = document.createElement("script");
+  socialScript.dataset.cfasync = "false";
+  socialScript.src = "https://bauval.org/14/2a853614df4aeefb9505b19f667e855d";
+  document.body.appendChild(socialScript);
 });
