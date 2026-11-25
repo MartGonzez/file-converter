@@ -1,4 +1,3 @@
-
 :root {
   --bg: #0f172a;
   --surface: #1e293b;
@@ -180,6 +179,131 @@ th { background: var(--surface); }
   align-items: center;
   overflow: hidden;
 }
+
+/* Imágenes dentro de artículos */
+.article-figure {
+  margin: 22px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.article-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+}
+
+.article-figure img:hover {
+  transform: scale(1.01);
+}
+
+.article-figure figcaption {
+  padding: 10px 14px;
+  font-size: 0.86rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
+/* Lightbox (Zoom al hacer clic) */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.92);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  padding: 20px;
+  cursor: zoom-out;
+}
+
+.lightbox-overlay.active { display: flex; }
+
+.lightbox-overlay img {
+  max-width: 95%;
+  max-height: 90vh;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* Comparador Interactivo Antes / Después */
+.compare-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 24px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  user-select: none;
+}
+
+.compare-box img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.compare-before {
+  clip-path: inset(0 50% 0 0);
+}
+
+.compare-slider {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: ew-resize;
+  z-index: 10;
+}
+
+.compare-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  background: var(--accent);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.compare-divider::after {
+  content: "↔";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--accent);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.compare-label {
+  position: absolute;
+  bottom: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  z-index: 4;
+}
+.label-left { left: 12px; }
+.label-right { right: 12px; }
 
 footer {
   border-top: 1px solid var(--border);
