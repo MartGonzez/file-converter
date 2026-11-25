@@ -37,4 +37,37 @@ document.addEventListener("DOMContentLoaded", () => {
   socialScript.dataset.cfasync = "false";
   socialScript.src = "https://bauval.org/14/2a853614df4aeefb9505b19f667e855d";
   document.body.appendChild(socialScript);
+
+  // 4. Lightbox automático para imágenes con clase .zoomable
+  const zoomImages = document.querySelectorAll(".zoomable");
+  if (zoomImages.length > 0) {
+    const overlay = document.createElement("div");
+    overlay.className = "lightbox-overlay";
+    const fullImg = document.createElement("img");
+    overlay.appendChild(fullImg);
+    document.body.appendChild(overlay);
+
+    zoomImages.forEach(img => {
+      img.addEventListener("click", () => {
+        fullImg.src = img.src;
+        fullImg.alt = img.alt;
+        overlay.classList.add("active");
+      });
+    });
+
+    overlay.addEventListener("click", () => overlay.classList.remove("active"));
+  }
+
+  // 5. Comparador deslizable Antes / Después
+  document.querySelectorAll(".compare-box").forEach(box => {
+    const slider = box.querySelector(".compare-slider");
+    const beforeImg = box.querySelector(".compare-before");
+    const divider = box.querySelector(".compare-divider");
+
+    slider.addEventListener("input", e => {
+      const val = e.target.value;
+      beforeImg.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
+      divider.style.left = `${val}%`;
+    });
+  });
 });
